@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steel Composition Galvanizing Advisor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Steel Composition Galvanizing Advisor</h1>
+        <form id="composition-form">
+            <label for="si">Silicon (Si) %:</label>
+            <input type="number" step="0.001" id="si" required>
+
+            <label for="p">Phosphorus (P) %:</label>
+            <input type="number" step="0.001" id="p" required>
+
+            <label for="steel-type">Steel type:</label>
+            <select id="steel-type">
+                <option value="hot">Hot Rolled</option>
+                <option value="cold">Cold Rolled</option>
+            </select>
+
+            <button type="submit">Evaluate</button>
+        </form>
+
+        <div id="result" class="hidden">
+            <h2>Results</h2>
+            <p><strong>Category:</strong> <span id="category"></span></p>
+            <p><strong>Visual Appearance:</strong> <span id="appearance"></span></p>
+            <p><strong>Resistance to Mechanical Damage:</strong> <span id="mechanical"></span></p>
+            <p><strong>Mass of Coating:</strong> <span id="mass"></span></p>
+            <p><strong>AS/NZS 4680 Compliance:</strong> <span id="compliance"></span></p>
+            <p><strong>Suggested Use Case:</strong> <span id="usecase"></span></p>
+            <p id="warning" class="warning"></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
