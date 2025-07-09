@@ -1,3 +1,25 @@
+// Theme handling
+function toggleTheme() {
+    const checkbox = document.getElementById('theme-checkbox');
+    const newTheme = checkbox.checked ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+}
+
+// Initialize theme and checkbox state
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    const checkbox = document.getElementById('theme-checkbox');
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (checkbox) checkbox.checked = (savedTheme === 'dark');
+}
+
+// Initialize theme on page load
+initTheme();
+
+// Initialize theme on page load
+initTheme();
+
 function classify(si, p, type) {
     let category = '';
     let warning = '';

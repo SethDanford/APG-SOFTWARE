@@ -3,9 +3,87 @@
     --primary-hover: #1d4ed8;
     --background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     --surface: #ffffff;
+    --text-color: #1e293b;
     --radius: 8px;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --transition: all 0.2s ease;
+}
+
+[data-theme="dark"] {
+    --primary: #bb86fc;
+    --primary-hover: #3700b3;
+    --background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+    --surface: #2a2a2a;
+    --text-color: #e0e0e0;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Theme Switch Toggle */
+.theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: inline-block;
+}
+
+.theme-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-toggle .slider {
+    position: relative;
+    width: 50px;
+    height: 24px;
+    background: var(--surface);
+    border-radius: 34px;
+    transition: background var(--transition);
+}
+
+.theme-toggle .slider:before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 2px;
+    top: 2px;
+    background: var(--background);
+    border-radius: 50%;
+    transition: transform var(--transition), background var(--transition);
+}
+
+.theme-toggle .slider .icon-sun,
+.theme-toggle .slider .icon-moon {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 16px;
+    height: 16px;
+    fill: var(--primary);
+    transition: fill var(--transition);
+}
+
+.theme-toggle .slider .icon-moon {
+    display: none;
+}
+
+.theme-toggle input:checked + .slider {
+    background: var(--primary);
+}
+
+.theme-toggle input:checked + .slider:before {
+    transform: translateX(26px);
+    background: var(--surface);
+}
+
+.theme-toggle input:checked + .slider .icon-sun {
+    display: none;
+}
+
+.theme-toggle input:checked + .slider .icon-moon {
+    display: block;
 }
 
 body {
@@ -13,7 +91,7 @@ body {
     margin: 0;
     padding: 20px;
     background: var(--background);
-    color: #1e293b;
+    color: var(--text-color);
 }
 
 .container {
@@ -33,7 +111,7 @@ label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #334155;
+    color: var(--text-color);
 }
 
 input, select {
