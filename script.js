@@ -17,8 +17,6 @@ function initTheme() {
 // Initialize theme on page load
 initTheme();
 
-// Initialize theme on page load
-initTheme();
 
 function classify(si, p, type) {
     let category = '';
