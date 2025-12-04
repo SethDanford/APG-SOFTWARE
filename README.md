@@ -1,5 +1,17 @@
 # Steel Composition Galvanizing Advisor
 
-This is a simple frontend web application that evaluates steel chemistry for galvanizing performance. It takes Silicon and Phosphorus percentages along with the steel type (hot or cold rolled) and outputs a category with corresponding guidance.
+A lightweight, client-side tool that turns steel chemistry and fabrication details into galvanizing guidance drawn from GAA Advisory Note 35 and AS/NZS 4680 expectations.
 
-Open `index.html` in a browser to use the tool.
+## Inputs
+- Chemical composition: Si (required), P (required), optional C/Mn/Al
+- Product details: steel grade, thickness, fabrication method, surface profile
+- Optional traceability: supplier, heat number, free-form fabrication notes
+
+## Outputs
+- Expected reactivity range (ULR/A/B/C/D) and appearance
+- Likely conformity to AS/NZS 4680
+- Notes on risks and practical process advice for the galvanizer
+- Simple “Export summary (PDF)” via the browser’s print dialog
+
+## Usage
+Open `index.html` in a browser and enter the chemistry plus context. The advisory updates instantly on submit and can be printed or saved as PDF for handover to the galvanizer.

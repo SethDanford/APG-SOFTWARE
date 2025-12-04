@@ -5,55 +5,179 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Steel Composition Galvanizing Advisor</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <label class="theme-switch">
-        <input type="checkbox" id="theme-checkbox" onclick="toggleTheme()">
-        <span class="slider">
-            <svg class="icon sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/>
-            </svg>
-            <svg class="icon moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.977 6.977 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 8 8 0 0 0 4 12z"/>
-            </svg>
-        </span>
-    </label>
-    <div class="container">
-        <h1>Steel Composition Galvanizing Advisor</h1>
-        <form id="composition-form">
-            <div class="form-group">
-                <label for="si">Silicon (Si) %:</label>
-                <input type="number" step="0.001" id="si" required>
-            </div>
-
-            <div class="form-group">
-                <label for="p">Phosphorus (P) %:</label>
-                <input type="number" step="0.001" id="p" required>
-            </div>
-
-            <div class="form-group">
-                <label for="steel-type">Steel type:</label>
-                <select id="steel-type">
-                    <option value="hot">Hot Rolled</option>
-                    <option value="cold">Cold Rolled</option>
-                </select>
-            </div>
-
-            <button type="submit">Evaluate</button>
-        </form>
-
-        <div id="result" class="hidden">
-            <h2>Results</h2>
-            <p><strong>Category:</strong> <span id="category"></span></p>
-            <p><strong>Visual Appearance:</strong> <span id="appearance"></span></p>
-            <p><strong>Resistance to Mechanical Damage:</strong> <span id="mechanical"></span></p>
-            <p><strong>Mass of Coating:</strong> <span id="mass"></span></p>
-            <p><strong>AS/NZS 4680 Compliance:</strong> <span id="compliance"></span></p>
-            <p><strong>Suggested Use Case:</strong> <span id="usecase"></span></p>
-            <p id="warning" class="warning"></p>
-        </div>
+    <div class="theme-control">
+        <span class="theme-label">Theme</span>
+        <label class="theme-switch">
+            <input type="checkbox" id="theme-checkbox" onclick="toggleTheme()" aria-label="Toggle light or dark theme">
+            <span class="slider">
+                <svg class="icon sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/>
+                </svg>
+                <svg class="icon moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.977 6.977 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 8 8 0 0 0 4 12z"/>
+                </svg>
+            </span>
+        </label>
     </div>
+    <main class="page">
+        <section class="panel hero">
+            <p class="eyebrow">Hot dip galvanizing readiness</p>
+            <h1>Steel Chemistry & Process Advisor</h1>
+            <p class="lede">Assess silicon and phosphorus bands, thickness, and fabrication to predict coating reactivity and give the galvanizer concise process notes. Built from GAA Advisory Note 35 and AS/NZS 4680 expectations.</p>
+            <div class="hero-meta">
+                <span class="pill">GAA Advisory Note 35</span>
+                <span class="pill">AS/NZS 4680 focus</span>
+            </div>
+        </section>
+
+        <section class="layout">
+            <form id="composition-form" class="panel form-panel">
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">Inputs</p>
+                        <h2>Steel and fabrication details</h2>
+                        <p class="muted">Silicon and phosphorus drive the category; thickness, fabrication heat, and surface profile tune the risks and advice.</p>
+                    </div>
+                    <div class="pill mild">Optional traceability fields don’t affect the calculation.</div>
+                </div>
+
+                <div class="field-section">
+                    <div class="section-title">Chemical composition</div>
+                    <div class="field-grid">
+                        <label class="field">
+                            <span>Silicon (Si) % <sup>*</sup></span>
+                            <input type="number" step="0.001" id="si" required placeholder="e.g. 0.14">
+                        </label>
+                        <label class="field">
+                            <span>Phosphorus (P) % <sup>*</sup></span>
+                            <input type="number" step="0.001" id="p" required placeholder="e.g. 0.020">
+                        </label>
+                        <label class="field">
+                            <span>Carbon (C) %</span>
+                            <input type="number" step="0.001" id="c" placeholder="e.g. 0.10">
+                        </label>
+                        <label class="field">
+                            <span>Manganese (Mn) %</span>
+                            <input type="number" step="0.01" id="mn" placeholder="e.g. 0.8">
+                        </label>
+                        <label class="field">
+                            <span>Aluminium (Al) %</span>
+                            <input type="number" step="0.001" id="al" placeholder="e.g. 0.030">
+                        </label>
+                    </div>
+                    <p class="hint">* Si and P are required to classify the steel into ULR/A/B/C/D bands per GAA guidance.</p>
+                </div>
+
+                <div class="field-section">
+                    <div class="section-title">Product details</div>
+                    <div class="field-grid">
+                        <label class="field">
+                            <span>Steel grade</span>
+                            <input type="text" id="grade" placeholder="e.g. HA300, C350L0, Xlerplate 250">
+                        </label>
+                        <label class="field">
+                            <span>Thickness (mm)</span>
+                            <input type="number" step="0.1" id="thickness" placeholder="e.g. 12">
+                        </label>
+                        <label class="field">
+                            <span>Surface profile / manufacturing method</span>
+                            <select id="surface">
+                                <option value="hot-rolled">Hot rolled</option>
+                                <option value="cold-formed">Cold formed / hollow section</option>
+                                <option value="blasted">Abrasive blasted</option>
+                                <option value="pickled">Pickled & oiled</option>
+                                <option value="as-fabricated">As fabricated</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>Fabrication details</span>
+                            <select id="fabrication">
+                                <option value="standard">Standard fabrication</option>
+                                <option value="laser-cut">Laser cut</option>
+                                <option value="plasma-cut">Plasma / flame cut</option>
+                                <option value="welded">Welded / heavy welds</option>
+                                <option value="machined">Machined</option>
+                            </select>
+                        </label>
+                    </div>
+                    <label class="field full">
+                        <span>Additional fabrication notes</span>
+                        <textarea id="fabrication-notes" rows="2" placeholder="e.g. Vent/drain detail, staggered thicknesses, mixed suppliers, etc."></textarea>
+                    </label>
+                </div>
+
+                <div class="field-section">
+                    <div class="section-title">Optional traceability</div>
+                    <div class="field-grid">
+                        <label class="field">
+                            <span>Supplier</span>
+                            <input type="text" id="supplier" placeholder="e.g. Mill or stockist">
+                        </label>
+                        <label class="field">
+                            <span>Heat number</span>
+                            <input type="text" id="heat-number" placeholder="e.g. Heat / cast / coil">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="submit">Generate advisory</button>
+                    <button type="button" class="ghost" id="export-pdf">Export summary (PDF)</button>
+                </div>
+            </form>
+
+            <section class="panel results hidden" id="result">
+                <div class="result-header">
+                    <div>
+                        <p class="eyebrow">Output</p>
+                        <h2>Galvanizing outlook</h2>
+                        <p class="muted">Expected reactivity, compliance confidence, risks, and process advice tailored to your inputs.</p>
+                    </div>
+                    <div class="badge" id="category-badge">Awaiting inputs</div>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="label">Expected reactivity range</div>
+                        <div class="value" id="reactivity"></div>
+                        <p class="muted" id="appearance"></p>
+                    </div>
+                    <div class="result-card">
+                        <div class="label">Expected to conform to standard</div>
+                        <div class="value status" id="compliance"></div>
+                        <p class="muted">Based on AS/NZS 4680 thickness expectations for the banded chemistry.</p>
+                    </div>
+                    <div class="result-card">
+                        <div class="label">Notes on risks</div>
+                        <ul id="risks"></ul>
+                    </div>
+                    <div class="result-card">
+                        <div class="label">Process advice for the galvanizer</div>
+                        <ul id="advice"></ul>
+                    </div>
+                </div>
+
+                <div class="summary">
+                    <div>
+                        <div class="label">Traceability</div>
+                        <p class="muted" id="traceability">No supplier / heat noted.</p>
+                    </div>
+                    <div>
+                        <div class="label">Product snapshot</div>
+                        <p class="muted" id="snapshot"></p>
+                    </div>
+                </div>
+
+    <div class="pdf-hint">
+                    <p>Use “Export summary (PDF)” to hand this advisory to your galvanizer or attach to a work order.</p>
+                </div>
+            </section>
+        </section>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="script.js"></script>
 </body>
 </html>
