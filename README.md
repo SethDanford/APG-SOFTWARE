@@ -14,4 +14,4 @@ A lightweight, client-side tool that turns steel chemistry and fabrication detai
 - Simple “Export summary (PDF)” via the browser’s print dialog
 
 ## Usage
-Open `index.html` in a browser and enter the chemistry plus context. The advisory updates instantly on submit and can be printed or saved as PDF for handover to the galvanizer.
+Open `https://sethdanford.github.io/APG-SOFTWARE/` in a browser and enter the chemistry plus context. The advisory updates instantly on submit and can be printed or saved as PDF for handover to the galvanizer.
