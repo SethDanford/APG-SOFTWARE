@@ -161,6 +161,55 @@ body {
     font-size: 14px;
 }
 
+.field-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-tip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand-strong);
+    background: rgba(15, 118, 110, 0.12);
+    border: 1px solid rgba(15, 118, 110, 0.35);
+    cursor: help;
+}
+
+.info-tip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 8px);
+    transform: translateX(-50%);
+    width: 260px;
+    max-width: 70vw;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--outline);
+    box-shadow: var(--shadow);
+    font-size: 12px;
+    line-height: 1.4;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+    z-index: 10;
+}
+
+.info-tip:hover::after,
+.info-tip:focus-visible::after {
+    opacity: 1;
+}
+
 .field input,
 .field select,
 .field textarea {
@@ -171,6 +220,16 @@ body {
     color: var(--text);
     font-size: 15px;
     transition: var(--transition);
+}
+
+.field input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.field input[type="number"]::-webkit-outer-spin-button,
+.field input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .field textarea {
@@ -323,6 +382,7 @@ ul {
 
 .full {
     width: 100%;
+    margin-top: 10px;
 }
 
 .theme-control {

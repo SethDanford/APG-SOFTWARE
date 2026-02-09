@@ -35,7 +35,7 @@ const categoryProfiles = {
     B: {
         label: 'B',
         reactivity: 'Moderate to high — mottled or grey, thicker coating likely.',
-        appearance: 'Si 0.14–0.25 often produces mottled/patchy coatings and thicker build-up above Table 3 values.',
+        appearance: 'Si 0.04–0.14 often produces mottled/patchy coatings and thicker build-up above Table 3 values.',
         conformance: { level: 'medium', text: 'May exceed AS/NZS 4680 Table 3 thickness; align finish expectations.' },
         risks: ['Thicker coatings reduce mechanical toughness at edges and corners.'],
         advice: ['Control immersion and cooling; radius edges and communicate likely grey appearance.']
@@ -43,7 +43,7 @@ const categoryProfiles = {
     C: {
         label: 'C',
         reactivity: 'Medium-high — extra thick/coarse coating possible.',
-        appearance: 'Si 0.04–0.14 (Category C) can create coarse, thick coatings with brittle alloy layers on heavy sections.',
+        appearance: 'Si above 0.14 up to 0.25, or low-Si steels with elevated P, can create coarse, thick coatings with brittle alloy layers on heavy sections.',
         conformance: { level: 'medium', text: 'Usually meets AS/NZS 4680 but can over-thicken; manage kettle time.' },
         risks: ['Higher risk of brittle alloy layers leading to damage at edges during handling.'],
         advice: ['Pre-grind oxide and sharp edges; request controlled immersion/cooling on heavy pieces.']
@@ -52,7 +52,7 @@ const categoryProfiles = {
         label: 'D',
         reactivity: 'High — very reactive, thick grey coating likely.',
         appearance: 'Si > 0.25 produces thick dull grey coatings with possible flaking between alloy layers.',
-        conformance: { level: 'low', text: 'Unlikely to match AS/NZS 4680 thickness targets without tight control.' },
+        conformance: { level: 'medium', text: 'Results in increasing HDG thickness above the AS/NZS 4680 requirements as the silicon level and steel thickness increase.' },
         risks: ['Excessive coating thickness and flaking risk, especially at corners and impact points.'],
         advice: ['Ask for reduced immersion time, careful cooling, and handling to limit cracking/flaking.']
     }
@@ -69,35 +69,40 @@ function getText(id) {
 
 function classifyChemistry(si, p) {
     if (!Number.isFinite(si) || !Number.isFinite(p)) {
-        return { category: null, profile: null, reasons: ['Provide silicon and phosphorus values.'], phosphorusHigh: false };
+        return { category: null, profile: null, reasons: ['Provide silicon and phosphorus values.'], phosphorusElevated: false, phosphorusHigh: false };
     }
 
     let category = 'C';
     const reasons = [];
+    const phosphorusElevated = p > 0.02;
+    const phosphorusHigh = p >= 0.035;
+    const meetsCategoryA = si >= 0.01 && si <= 0.04 && p < 0.02 && si + 2.5 * p <= 0.09;
 
     if (si < 0.01) {
         category = 'ULR';
         reasons.push('Si below 0.01% (ULR band).');
-    } else if (si <= 0.04 && p < 0.02 && si + 2.5 * p <= 0.09) {
+    } else if (meetsCategoryA) {
         category = 'A';
-        reasons.push('Si 0.01–0.04 with low P and Si + 2.5P ≤ 0.09 (Category A).');
-    } else if (si >= 0.25) {
+        reasons.push('Si 0.01–0.04 with low P and Si + 2.5P ≤ 0.09 (Category A, hot rolled).');
+    } else if (si > 0.25) {
         category = 'D';
         reasons.push('Si above 0.25% (Category D reactive steel).');
-    } else if (si >= 0.14) {
+    } else if (si > 0.14) {
+        category = 'C';
+        reasons.push('Si above 0.14% up to 0.25% (Category C).');
+    } else if (si > 0.04) {
         category = 'B';
-        reasons.push('Si 0.14–0.25 (Category B).');
+        reasons.push('Si 0.04–0.14 (Category B).');
     } else {
         category = 'C';
-        reasons.push('Si 0.04–0.14 (Category C band).');
+        reasons.push('Si 0.01–0.04 with elevated P or Si + 2.5P > 0.09; Category A (hot rolled) requires Si + 2.5P ≤ 0.09 and P < 0.02.');
     }
 
-    const phosphorusHigh = p >= 0.035;
-    if (phosphorusHigh) {
-        reasons.push('P above 0.035% can increase coating thickness and mottling.');
+    if (phosphorusElevated) {
+        reasons.push('P above 0.02% can increase coating thickness and mottling.');
     }
 
-    return { category, profile: categoryProfiles[category], reasons, phosphorusHigh };
+    return { category, profile: categoryProfiles[category], reasons, phosphorusElevated, phosphorusHigh };
 }
 
 function buildAdvisory(inputs) {
@@ -114,9 +119,11 @@ function buildAdvisory(inputs) {
     let appearance = profile.appearance;
 
     if (classification.phosphorusHigh) {
-        risks.add('High phosphorus (>0.035%) can drive thicker, rough coatings and brittleness.');
+        risks.add('High phosphorus (≥0.035%) can drive thicker, rough coatings and brittleness.');
         advice.add('Discuss tighter kettle time/quench control and inspect for brittle alloy layers.');
         if (compliance.level === 'high') compliance.level = 'medium';
+    } else if (classification.phosphorusElevated) {
+        risks.add('Phosphorus above 0.02% can increase coating thickness and mottling.');
     }
 
     if (inputs.al && inputs.al > 0.035 && ['A', 'C'].includes(classification.category)) {
@@ -162,6 +169,7 @@ function buildAdvisory(inputs) {
         reactivity: reactivityText,
         appearance,
         compliance: { level: compliance.level, text: complianceText },
+        classificationNotes: classification.reasons,
         risks: Array.from(risks),
         advice: Array.from(advice)
     };
@@ -174,6 +182,12 @@ function renderResult(advisory, inputs) {
     document.getElementById('category-badge').textContent = `Category ${advisory.category}`;
     document.getElementById('reactivity').textContent = advisory.reactivity;
     document.getElementById('appearance').textContent = advisory.appearance;
+    const notesEl = document.getElementById('classification-notes');
+    if (notesEl) {
+        notesEl.textContent = advisory.classificationNotes && advisory.classificationNotes.length
+            ? `Basis: ${advisory.classificationNotes.join(' ')}`
+            : '';
+    }
 
     const complianceEl = document.getElementById('compliance');
     complianceEl.textContent = advisory.compliance.text;
