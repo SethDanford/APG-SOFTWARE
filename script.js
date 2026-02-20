@@ -19,7 +19,7 @@ const categoryProfiles = {
     ULR: {
         label: 'ULR',
         reactivity: 'Very low — bright, thin coating expected.',
-        appearance: 'Bright, smooth, thinner coating typical of ultra-low reactivity steels (Si < 0.01%).',
+        appearance: 'Bright, smooth, thinner coating typical of ultra-low reactivity steels (Si ≤ 0.01%).',
         conformance: { level: 'high', text: 'Likely to meet AS/NZS 4680 Table 4 for ULR steels.' },
         risks: ['Thin coating compared with standard categories; appearance will differ if mixed with other chemistries.'],
         advice: ['Standard pre-treatment is sufficient; avoid unnecessary abrasive blasting that could drive higher pick-up.']
@@ -27,7 +27,7 @@ const categoryProfiles = {
     A: {
         label: 'A',
         reactivity: 'Low to moderate — bright to semi-bright.',
-        appearance: 'Si 0.01–0.04 with low P normally gives a bright smooth coating.',
+        appearance: '0.01 < Si ≤ 0.04 with low P normally gives a bright smooth coating.',
         conformance: { level: 'high', text: 'Expected to meet AS/NZS 4680 Table 3 thickness requirements.' },
         risks: ['Appearance can vary at heavy section changes if cooling is slow.'],
         advice: ['Normal HDG practice; share cosmetic expectations if a bright finish is important.']
@@ -35,7 +35,7 @@ const categoryProfiles = {
     B: {
         label: 'B',
         reactivity: 'Moderate to high — mottled or grey, thicker coating likely.',
-        appearance: 'Si 0.04–0.14 often produces mottled/patchy coatings and thicker build-up above Table 3 values.',
+        appearance: 'Si above 0.14 up to 0.25 often produces mottled/patchy coatings and thicker build-up above Table 3 values.',
         conformance: { level: 'medium', text: 'May exceed AS/NZS 4680 Table 3 thickness; align finish expectations.' },
         risks: ['Thicker coatings reduce mechanical toughness at edges and corners.'],
         advice: ['Control immersion and cooling; radius edges and communicate likely grey appearance.']
@@ -43,7 +43,7 @@ const categoryProfiles = {
     C: {
         label: 'C',
         reactivity: 'Medium-high — extra thick/coarse coating possible.',
-        appearance: 'Si above 0.14 up to 0.25, or low-Si steels with elevated P, can create coarse, thick coatings with brittle alloy layers on heavy sections.',
+        appearance: 'Si 0.04–0.14 (Category C) or low-Si steels with elevated P can create coarse, thick coatings with brittle alloy layers on heavy sections.',
         conformance: { level: 'medium', text: 'Usually meets AS/NZS 4680 but can over-thicken; manage kettle time.' },
         risks: ['Higher risk of brittle alloy layers leading to damage at edges during handling.'],
         advice: ['Pre-grind oxide and sharp edges; request controlled immersion/cooling on heavy pieces.']
@@ -76,26 +76,26 @@ function classifyChemistry(si, p) {
     const reasons = [];
     const phosphorusElevated = p > 0.02;
     const phosphorusHigh = p >= 0.035;
-    const meetsCategoryA = si >= 0.01 && si <= 0.04 && p < 0.02 && si + 2.5 * p <= 0.09;
+    const meetsCategoryA = si > 0.01 && si <= 0.04 && p < 0.02 && si + 2.5 * p <= 0.09;
 
-    if (si < 0.01) {
+    if (si <= 0.01) {
         category = 'ULR';
-        reasons.push('Si below 0.01% (ULR band).');
+        reasons.push('Si at or below 0.01% (ULR band).');
     } else if (meetsCategoryA) {
         category = 'A';
-        reasons.push('Si 0.01–0.04 with low P and Si + 2.5P ≤ 0.09 (Category A, hot rolled).');
+        reasons.push('0.01 < Si ≤ 0.04 with low P and Si + 2.5P ≤ 0.09 (Category A, hot rolled).');
     } else if (si > 0.25) {
         category = 'D';
         reasons.push('Si above 0.25% (Category D reactive steel).');
     } else if (si > 0.14) {
-        category = 'C';
-        reasons.push('Si above 0.14% up to 0.25% (Category C).');
-    } else if (si > 0.04) {
         category = 'B';
-        reasons.push('Si 0.04–0.14 (Category B).');
+        reasons.push('Si above 0.14% up to 0.25% (Category B).');
+    } else if (si > 0.04) {
+        category = 'C';
+        reasons.push('Si 0.04–0.14 (Category C band).');
     } else {
         category = 'C';
-        reasons.push('Si 0.01–0.04 with elevated P or Si + 2.5P > 0.09; Category A (hot rolled) requires Si + 2.5P ≤ 0.09 and P < 0.02.');
+        reasons.push('0.01 < Si ≤ 0.04 with P at or above 0.02, or Si + 2.5P > 0.09; Category A (hot rolled) requires 0.01 < Si ≤ 0.04, Si + 2.5P ≤ 0.09, and P < 0.02.');
     }
 
     if (phosphorusElevated) {
@@ -117,8 +117,21 @@ function buildAdvisory(inputs) {
 
     let compliance = { ...profile.conformance };
     let appearance = profile.appearance;
+    const lowSiCategoryC = classification.category === 'C' && Number.isFinite(inputs.si) && inputs.si <= 0.04;
+    const phosphorusAtOrAboveCategoryAThreshold = Number.isFinite(inputs.p) && inputs.p >= 0.02;
 
-    if (classification.phosphorusHigh) {
+    if (lowSiCategoryC && classification.phosphorusHigh) {
+        risks.delete('Higher risk of brittle alloy layers leading to damage at edges during handling.');
+        appearance = 'Low-Si steel with high phosphorus (≥0.035%) can produce very thick, brittle coatings with poor appearance.';
+        risks.add('Coating can be very thick and brittle with poor appearance at high phosphorus levels.');
+        advice.add('Discuss tighter kettle time/quench control and inspect for brittle alloy layers and rough finish.');
+        if (compliance.level === 'high') compliance.level = 'medium';
+    } else if (lowSiCategoryC && phosphorusAtOrAboveCategoryAThreshold) {
+        risks.delete('Higher risk of brittle alloy layers leading to damage at edges during handling.');
+        appearance = 'Low-Si steel with phosphorus at or above 0.02% is generally normal in appearance but may show local coating roughness, including pimples and striations.';
+        risks.add('Local coating roughness, including pimples and striations, may occur.');
+        advice.add('Set finish expectations for possible local roughness, pimples, and striations.');
+    } else if (classification.phosphorusHigh) {
         risks.add('High phosphorus (≥0.035%) can drive thicker, rough coatings and brittleness.');
         advice.add('Discuss tighter kettle time/quench control and inspect for brittle alloy layers.');
         if (compliance.level === 'high') compliance.level = 'medium';
