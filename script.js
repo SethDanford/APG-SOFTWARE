@@ -261,6 +261,47 @@ function mapFabricationLabel(value) {
     return labels[value] || value;
 }
 
+function nextFrame() {
+    return new Promise(resolve => requestAnimationFrame(() => resolve()));
+}
+
+function waitForImage(image) {
+    return new Promise(resolve => {
+        const finish = () => resolve();
+
+        if (image.complete) {
+            if (typeof image.decode === 'function') {
+                image.decode().catch(() => {}).finally(finish);
+                return;
+            }
+            finish();
+            return;
+        }
+
+        image.addEventListener('load', finish, { once: true });
+        image.addEventListener('error', finish, { once: true });
+    });
+}
+
+function preparePdfLogos(main) {
+    const logoData = window.PDF_LOGO_DATA || {};
+    const restorers = [];
+
+    main.querySelectorAll('img[data-pdf-logo]').forEach(image => {
+        const logoKey = image.dataset.pdfLogo;
+        const pdfSrc = logoData[logoKey];
+        if (!pdfSrc) return;
+
+        const previousSrc = image.getAttribute('src');
+        image.setAttribute('src', pdfSrc);
+        restorers.push(() => image.setAttribute('src', previousSrc));
+    });
+
+    return () => {
+        restorers.reverse().forEach(restore => restore());
+    };
+}
+
 document.getElementById('composition-form').addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -286,7 +327,7 @@ document.getElementById('composition-form').addEventListener('submit', function 
     renderResult(advisory, inputs);
 });
 
-function exportPdf() {
+async function exportPdf() {
     const main = document.querySelector('main');
     if (!main) return;
 
@@ -309,17 +350,28 @@ function exportPdf() {
         margin: 0,
         filename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0, windowWidth: document.documentElement.clientWidth, windowHeight: document.documentElement.scrollHeight },
+        html2canvas: { backgroundColor: '#ffffff', scale: 2, useCORS: true, scrollX: 0, scrollY: 0, windowWidth: document.documentElement.clientWidth, windowHeight: document.documentElement.scrollHeight },
         jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
 
     document.body.classList.add('pdf-exporting');
-    html2pdf().from(main).set(options).save().finally(() => {
+    const restoreLogos = preparePdfLogos(main);
+    const images = Array.from(main.querySelectorAll('img'));
+
+    try {
+        await Promise.all(images.map(waitForImage));
+        await nextFrame();
+        await html2pdf().from(main).set(options).save();
+    } catch (error) {
+        console.error('PDF export failed', error);
+        alert('PDF export failed. Please try again. If the problem persists, refresh the page and retry.');
+    } finally {
+        restoreLogos();
         document.body.classList.remove('pdf-exporting');
         document.documentElement.setAttribute('data-theme', previousTheme);
         if (themeToggle && previousToggle !== null) themeToggle.checked = previousToggle;
         window.scrollTo(0, previousScroll);
-    });
+    }
 }
 
 document.getElementById('export-pdf').addEventListener('click', exportPdf);
